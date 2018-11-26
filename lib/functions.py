@@ -10,6 +10,7 @@ import py_common_subseq.py_common_subseq as CS #Need to change xrange() as range
 import math
 import pandas as pd
 
+
 # Candidate search
 class project4():
     
@@ -18,7 +19,7 @@ class project4():
         for Wc in Dictionary:
             dist = damerau_levenshtein_distance(Wc, We)
             if dist <= threshold:
-                candidate[Wc] = dist
+                candidate[Wc] = Dictionary[Wc]
                 
         return(candidate)
         
@@ -79,11 +80,43 @@ class project4():
                 lcsn = sorted(common_subseq_MidLetter, key=lambda x: len(x))[-1]
                 
             denom = len(Wc) + len(We)
-            nlcs = (2*len(lcs)**2)/denom
-            nmnlcs1 = (2*len(lcs1)**2)/denom
-            nmnlcsn = (2*len(lcsn)**2)/denom
-            nmnlcsz = (2*len(lcsz)**2)/denom
+# =============================================================================
+#             nlcs = (2*len(lcs)**2)/denom
+#             nmnlcs1 = (2*len(lcs1)**2)/denom
+#             nmnlcsn = (2*len(lcsn)**2)/denom
+#             nmnlcsz = (2*len(lcsz)**2)/denom
+# =============================================================================
+            # original paper
+            nlcs = (2*len(lcs))/denom
+            nmnlcs1 = (2*len(lcs1))/denom
+            nmnlcsn = (2*len(lcsn))/denom
+            nmnlcsz = (2*len(lcsz))/denom
             score = a1*nlcs + a2*nmnlcs1 + a3*nmnlcsn + a4*nmnlcsz
             Score[Wc] = score
         
         return(Score)
+        
+# Language popularity
+    def popularity_score(candidates):
+        Score = {}
+        denom = max(candidates.values())
+        for Wc in candidates:
+            score = candidates[Wc]/denom
+            Score[Wc] = score
+        
+        return(Score)
+
+# Lexicon existance
+    def existance_score(candidates, lexicon): # lexicon is a set {candidate1, candidate2}
+        Score = {}
+        for Wc in candidates:
+            score = int(Wc in lexicon)
+            Score[Wc] = score
+        
+        return(Score)
+        
+# Exact-context popularity
+#    def 
+            
+        
+        
