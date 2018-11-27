@@ -1,0 +1,200 @@
+---
+title: 'Optical character recognition (OCR)'
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    number_sections: true
+    code_folding: hide
+---
+
+Jing Wu
+
+GU4243/GR5243: Applied Data Science
+
+<style type="text/css">
+h1.title {
+  font-size: 24px;
+  color: Black;
+}
+h1 { /* Header 1 */
+  font-size: 24px;
+  color: Black;
+}
+h2 { /* Header 2 */
+  font-size: 20px;
+  color: Black;
+}
+h3 { /* Header 3 */
+  font-size: 16px;
+  color: Black;
+}
+h4 { /* Header 4 */
+  font-size: 14px;
+  color: Grey;
+}
+</style>
+# Introduction {-}
+
+Optical character recognition (OCR) is the process of converting scanned images of machine printed or
+handwritten text (numerals, letters, and symbols), into machine readable character streams, plain (e.g. text files) or formatted (e.g. HTML files). As shown in Figure 1, the data *workflow* in a typical OCR system consists of three major stages:
+
+* Pre-processing
+
+* OCR character recognition
+
+* Post-processing
+
+![](../figs/ocr_flowchart.png) 
+
+We have processed raw scanned images through the first two steps are relying on the [Tessearct OCR machine](https://en.wikipedia.org/wiki/Tesseract_(software)). R package tutorial can be found [here](https://www.r-bloggers.com/the-new-tesseract-package-high-quality-ocr-in-r/). 
+
+BUT this is not the FOCUS of this project!!!
+
+In this project, we are going to **focus on the third stage -- post-processing**, which includes two tasks: *error detection* and *error correction*.  
+
+# Step 1 - Load library and source code
+```{r, warning=FALSE, message = FALSE}
+# if (!require("devtools")) install.packages("devtools")
+# if (!require("pacman")) {
+#   ## devtools is required
+#  library(devtools)
+#  install_github("trinker/pacman")
+# }
+library(devtools)
+library(pacman)
+library(tm)
+library(tidytext)
+library(tidyverse)
+library(DT)
+
+#setwd("E:/study/Columbia University/2018FALL/ads5243/project4/Fall2018-Project4-sec1--sec1-proj4-grp5")
+
+pacman::p_load(knitr, readr, stringr, tesseract, vecsets)
+source('../lib/ifCleanToken.R')
+file_name_vec <- list.files("../data/ground_truth") #100 files in total
+```
+
+# Step 2 - read the files and conduct Tesseract OCR
+
+Although we have processed the Tesseract OCR and save the output txt files in the `data` folder, we include this chunk of code in order to make clear the whole pipeline to you.
+
+```{r, eval=FALSE}
+for(i in c(1:length(file_name_vec))){
+  current_file_name <- sub(".txt","",file_name_vec[i])
+  ## png folder is not provided on github (the code is only on demonstration purpose)
+  current_tesseract_txt <- tesseract::ocr(paste("../data/png/",current_file_name,".png",sep=""))
+  
+  ### clean the tessetact text (separate line by "\n", delete null string, transter to lower case)
+  clean_tesseract_txt <- strsplit(current_tesseract_txt,"\n")[[1]]
+  clean_tesseract_txt <- clean_tesseract_txt[clean_tesseract_txt!=""]
+  
+  ### save tesseract text file
+  writeLines(clean_tesseract_txt, paste("../data/tesseract/",current_file_name,".txt",sep=""))
+}
+```
+
+# Step 3 - Error detection
+
+Now, we are ready to conduct post-processing, based on the Tessearct OCR output. First of all, we need to detect errors, or *incorrectly processed words* -- check to see if an input string is a valid dictionary word or if its n-grams are all legal.
+
+The referenced papers are:
+
+1. [Rule-based techniques](http://webpages.ursinus.edu/akontostathis/KulpKontostathisFinal.pdf)
+
+- rules are in the section 2.2 
+
+2. [Letter n-gram](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1672564)
+
+- focus on positional binary digram in section 3-a.error detection
+
+3. Probabilistic techniques -- [SVM garbage detection](https://dl.acm.org/citation.cfm?doid=2034617.2034626)
+
+- features are in section 5 (you can choose not to implement ‘Levenshtein distance’ feature)
+
+
+In this statercode, we implement the first three rules in the first paper -- rule based techniques, as an example.
+
+```{r}
+### only process one of the files in the folder as an example, in your project, you need to use all the files
+current_file_name <- sub(".txt","",file_name_vec[5])
+
+## read the ground truth text
+current_ground_truth_txt <- readLines(paste("../data/ground_truth/",current_file_name,".txt",sep=""), warn=FALSE)
+#clean_ground_truth_txt = paste(current_ground_truth_txt, collapse = " ") # zx2229
+#ground_truth_vec <- str_split(clean_ground_truth_txt," ")[[1]] # zx2229
+
+current_ground_truth_txt = gsub("..."," ",current_ground_truth_txt,fixed = TRUE)
+
+current_ground_truth_txt = gsub("\"","", current_ground_truth_txt,fixed=TRUE)
+
+corpus <- VCorpus(VectorSource(current_ground_truth_txt))%>%
+  tm_map(content_transformer(tolower))%>%
+  tm_map(removePunctuation)%>%
+  tm_map(removeNumbers)%>%
+  tm_map(removeWords, character(0))%>%
+  tm_map(stripWhitespace)
+
+dict <- tidy(corpus) %>%
+  select(text) %>%
+  unnest_tokens(dictionary, text)
+
+## read the tesseract text
+current_tesseract_txt <- readLines(paste("../data/tesseract/",current_file_name,".txt",sep=""), warn=FALSE)
+clean_tesseract_txt <- paste(current_tesseract_txt, collapse = " ")
+
+## detect tesseract word error
+tesseract_vec <- str_split(clean_tesseract_txt," ")[[1]] #1124 tokens
+tesseract_vec = gsub("..."," ",tesseract_vec,fixed = TRUE)
+
+tesseract_vec = gsub("\"","", tesseract_vec,fixed=TRUE)
+
+corpus <- VCorpus(VectorSource(tesseract_vec))%>%
+  tm_map(content_transformer(tolower))%>%
+  tm_map(removePunctuation)%>%
+  tm_map(removeNumbers)%>%
+  tm_map(removeWords, character(0))%>%
+  tm_map(stripWhitespace)
+
+dict_tesseract <- tidy(corpus) %>%
+  select(text) %>%
+  unnest_tokens(dictionary, text)
+
+tesseract_if_clean <- unlist(lapply(tesseract_vec,ifCleanToken)) # source code of ifCleanToken in in lib folder
+```
+
+
+```{r}
+# Save the ground truth dictionary
+dictionary <- list()
+for(i in 1:length(file_name_vec)){
+  current_file_name <- sub(".txt","",file_name_vec[i])
+
+## read the ground truth text
+current_ground_truth_txt <- readLines(paste("../data/ground_truth/",current_file_name,".txt",sep=""), warn=FALSE)
+#clean_ground_truth_txt = paste(current_ground_truth_txt, collapse = " ") # zx2229
+#ground_truth_vec <- str_split(clean_ground_truth_txt," ")[[1]] # zx2229
+
+current_ground_truth_txt = gsub("..."," ",current_ground_truth_txt,fixed = TRUE)
+
+current_ground_truth_txt = gsub("\"","", current_ground_truth_txt,fixed=TRUE)
+
+corpus <- VCorpus(VectorSource(current_ground_truth_txt))%>%
+  tm_map(content_transformer(tolower))%>%
+  tm_map(removePunctuation)%>%
+  tm_map(removeNumbers)%>%
+  tm_map(removeWords, character(0))%>%
+  tm_map(stripWhitespace)
+
+dict <- tidy(corpus) %>%
+  select(text) %>%
+  unnest_tokens(dictionary, text)
+dictionary[[i]] <- dict
+path <- "/Users/janechen/Documents/GitHub/Fall2018-Project4-sec1--sec1-proj4-grp5/data/ground_truth/"
+csv_name <- paste0(paste0(path, current_file_name),".csv")
+write.csv(dictionary[[i]], file = csv_name)
+}
+```
