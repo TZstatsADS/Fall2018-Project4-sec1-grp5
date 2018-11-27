@@ -116,7 +116,52 @@ class project4():
         return(Score)
         
 # Exact-context popularity
-#    def 
+    def exact_popularity_score(candidates, We, five_gram_E, five_gram_dic): # five_gram_E is 5-gram with We, five_gram_dic is dictionary {5 gram w/ Wc: frequency}
+        Score = {}
+        Numer = {}
+        for Wc in candidates:
+            five_gram_C = []
+            for five_gram in five_gram_E:
+                five_gram_C.append(five_gram.replace(We, Wc, 1))
+            numer = 0
+            for five_gram_c in give_gram_C:
+                numer = numer + five_gram_dic[five_gram_c]
+            Numer[Wc] = numer
+        
+        Denom = max(Numer.values())
+        for Wc in candidates:
+            Score[Wc] = Numer[Wc]/Denom
             
+        return(Score)
+        
+# Relaxed-context popularity
+    def relaxed_popularity_score(candidates, We, five_gram_E, five_gram_dic_X):
+        Score = {}
+        Numer = {}
+        for Wc in candidates:
+            five_gram_C = []
+            grams_C_X = []
+            for five_gram in five_gram_E:
+                five_gram_C.append(five_gram.replace(We, Wc, 1))
+            for i in range(5):
+                five_gram_s = list(jieba.cut(five_gram_C[i]))
+                for k in range(5):
+                    if -i+4==k:
+                        continue
+                    else:
+                        five_gram_s_copy = copy.deepcopy(five_gram_s)
+                        five_gram_s_copy[2*k] = "*"
+                        gram_c_x = "".join(five_gram_s_copy)
+                        grams_C_X.append(gram_c_x)
+            numer = 0
+            for five_gram_c_x in grams_C_X:
+                numer = numer + five_gram_dic_X[five_gram_c_x]
+            Numer[Wc] = numer
+        
+        Denom = max(Numer.values())
+        for Wc in candidates:
+            Score[Wc] = Numer[Wc]/Denom
+        
+        return(Score)
         
         
