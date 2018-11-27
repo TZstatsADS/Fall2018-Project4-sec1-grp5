@@ -68,6 +68,8 @@ neighbor_words = function(orc,truth){
                                    word_list[[i+4]][1])
     }
     
+    else{ word_list[[i]] = list.append(word_list[[i]],rep(0,8))}
+    
    
   
   }
