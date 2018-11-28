@@ -71,7 +71,7 @@ library(tidytext)
 library(tidyverse)
 library(DT)
 
-#setwd("E:/study/Columbia University/2018FALL/ads5243/project4/Fall2018-Project4-sec1--sec1-proj4-grp5")
+setwd("/Users/janechen/Documents/GitHub/Fall2018-Project4-sec1--sec1-proj4-grp5/lib")
 
 pacman::p_load(knitr, readr, stringr, tesseract, vecsets)
 source('../lib/ifCleanToken.R')
@@ -124,6 +124,7 @@ current_file_name <- sub(".txt","",file_name_vec[5])
 
 ## read the ground truth text
 current_ground_truth_txt <- readLines(paste("../data/ground_truth/",current_file_name,".txt",sep=""), warn=FALSE)
+
 #clean_ground_truth_txt = paste(current_ground_truth_txt, collapse = " ") # zx2229
 #ground_truth_vec <- str_split(clean_ground_truth_txt," ")[[1]] # zx2229
 
@@ -169,10 +170,13 @@ tesseract_if_clean <- unlist(lapply(tesseract_vec,ifCleanToken)) # source code o
 
 ```{r}
 # Save the ground truth dictionary
+group <- c()
 dictionary <- list()
+
 for(i in 1:length(file_name_vec)){
   current_file_name <- sub(".txt","",file_name_vec[i])
-
+  current_group <- substr(current_file_name,1,6)
+  group <- c(group, current_group)
 ## read the ground truth text
 current_ground_truth_txt <- readLines(paste("../data/ground_truth/",current_file_name,".txt",sep=""), warn=FALSE)
 #clean_ground_truth_txt = paste(current_ground_truth_txt, collapse = " ") # zx2229
@@ -192,9 +196,40 @@ corpus <- VCorpus(VectorSource(current_ground_truth_txt))%>%
 dict <- tidy(corpus) %>%
   select(text) %>%
   unnest_tokens(dictionary, text)
+
 dictionary[[i]] <- dict
-path <- "/Users/janechen/Documents/GitHub/Fall2018-Project4-sec1--sec1-proj4-grp5/data/ground_truth/"
-csv_name <- paste0(paste0(path, current_file_name),".csv")
-write.csv(dictionary[[i]], file = csv_name)
 }
+
+group1 <- data_frame()
+group2 <- data_frame()
+group3 <- data_frame()
+group4 <- data_frame()
+group5 <- data_frame()
+
+ path <- "/Users/janechen/Documents/GitHub/Fall2018-Project4-sec1--sec1-proj4-grp5/data/ground_truth/"
+ 
+for (i in 1:length(group)) {
+  
+  if(group[i] == "group1"){
+    group1 <- rbind(group1, dictionary[[i]])
+  }
+   else if(group[i] == "group2"){
+    group2 <- rbind(group2, dictionary[[i]])
+   }
+   else if(group[i] == "group3"){
+    group3 <- rbind(group3, dictionary[[i]])
+   }
+   else if(group[i] == "group4"){
+    group4 <- rbind(group4, dictionary[[i]])
+   }
+   else{
+    group5 <- rbind(group5, dictionary[[i]])
+  }
+}
+ 
+  write.csv(dict, file = paste0(paste0(path, "group1"),".csv"))
+  write.csv(dict, file = paste0(paste0(path, "group2"),".csv"))
+  write.csv(dict, file = paste0(paste0(path, "group3"),".csv"))
+  write.csv(dict, file = paste0(paste0(path, "group4"),".csv"))
+  write.csv(dict, file = paste0(paste0(path, "group5"),".csv"))
 ```
