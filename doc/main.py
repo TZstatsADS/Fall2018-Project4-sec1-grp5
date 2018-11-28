@@ -17,6 +17,8 @@ sys.path.append("..")
 from lib.functions import project4 as p4 
 
 
+
+
 Dictionary = pd.read_csv("../output/test_dictionary.csv").word
 Threshold = 3
 We = 'rah'
@@ -31,23 +33,36 @@ simi_score = p4.similarity_score(Candidates, We, a1, a2, a3, a4)
 
 #------------------------------
 
-# =============================================================================
-# 
-# from collections import Counter
-# 
-# file_object = open('../data/ground_truth/group1_00000005.txt')
-# try:
-#     file_context = file_object.read()
-# finally:
-#     file_object.close()
-# 
-# 
-# 
-# text = file_context
-# data_ = jieba.cut(text)
-# data = dict(Counter(data_))
-# data['rch']
-# =============================================================================
+import numpy as np
+import os
+from collections import Counter
+import re, string
+from string import digits
+
+#file_object = open('../data/ground_truth/group1_00000005.txt')
+
+TEXT = str()
+dirpath = '../data/ground_truth/'
+for root, dirs, files in os.walk(dirpath):
+    for file in files:
+        file_object = open(dirpath+file)
+        try:
+            file_context = file_object.read()
+        finally:
+            file_object.close()
+        text = file_context.lower()
+        exclude = set(string.punctuation)
+        text = ''.join(ch for ch in text if ch not in exclude)
+        remove_digits = str.maketrans('', '', digits)
+        text = text.translate(remove_digits)
+
+        TEXT = TEXT + text
+
+
+data_ = jieba.cut(TEXT)
+data = dict(Counter(data_))
+
+data['rch']
 # =============================================================================
 # We = "eve"
 # Wc = "King"
@@ -85,4 +100,4 @@ for i in range(2):
 Feature = Freature.append(label_1)
 
 
-.readli
+CS.find_common_subsequences("qweert", "qwwert")
