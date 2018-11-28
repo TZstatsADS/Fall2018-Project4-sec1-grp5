@@ -89,8 +89,6 @@ neighbor_words = function(orc,truth){
   
   truth = c(rep("*",4),truth,rep("*",4))
   
-  word_list
-  
   for(i in 5:(length(word_list)-4)){
     #& i <= (length(word_list) - 4) & i >= 5#
     if((word_list[[i]][2]==FALSE))
