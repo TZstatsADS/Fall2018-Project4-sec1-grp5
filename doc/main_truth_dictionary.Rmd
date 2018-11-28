@@ -212,24 +212,29 @@ for (i in 1:length(group)) {
   
   if(group[i] == "group1"){
     group1 <- rbind(group1, dictionary[[i]])
+    group1 <- group1[!duplicated(group1),]
   }
    else if(group[i] == "group2"){
     group2 <- rbind(group2, dictionary[[i]])
+    group2 <- group2[!duplicated(group2),]
    }
    else if(group[i] == "group3"){
     group3 <- rbind(group3, dictionary[[i]])
+    group3 <- group3[!duplicated(group3),]
    }
    else if(group[i] == "group4"){
     group4 <- rbind(group4, dictionary[[i]])
+    group4 <- group4[!duplicated(group4),]
    }
    else{
     group5 <- rbind(group5, dictionary[[i]])
+    group5 <- group5[!duplicated(group5),]
   }
 }
- 
-  write.csv(dict, file = paste0(paste0(path, "group1"),".csv"))
-  write.csv(dict, file = paste0(paste0(path, "group2"),".csv"))
-  write.csv(dict, file = paste0(paste0(path, "group3"),".csv"))
-  write.csv(dict, file = paste0(paste0(path, "group4"),".csv"))
-  write.csv(dict, file = paste0(paste0(path, "group5"),".csv"))
+
+  write.csv(group1, file = paste0(paste0(path, "group1"),".csv"))
+  write.csv(group2, file = paste0(paste0(path, "group2"),".csv"))
+  write.csv(group3, file = paste0(paste0(path, "group3"),".csv"))
+  write.csv(group4, file = paste0(paste0(path, "group4"),".csv"))
+  write.csv(group5, file = paste0(paste0(path, "group5"),".csv"))
 ```
