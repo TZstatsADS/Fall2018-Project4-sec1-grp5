@@ -152,16 +152,30 @@ class project4():
             grams_C_X = []
             for five_gram in five_gram_E:
                 five_gram_C.append(five_gram.replace(We, Wc, 1))
-            for i in range(5):
+# 3-gram               
+            for i in range(3):
                 five_gram_s = list(jieba.cut(five_gram_C[i]))
-                for k in range(5):
-                    if -i+4==k:
+                for k in range(3):
+                    if -i+2==k:
                         continue
                     else:
                         five_gram_s_copy = copy.deepcopy(five_gram_s)
                         five_gram_s_copy[2*k] = "*"
                         gram_c_x = "".join(five_gram_s_copy)
                         grams_C_X.append(gram_c_x)
+# 5-gram                        
+# =============================================================================
+#             for i in range(5):
+#                 five_gram_s = list(jieba.cut(five_gram_C[i]))
+#                 for k in range(5):
+#                     if -i+4==k:
+#                         continue
+#                     else:
+#                         five_gram_s_copy = copy.deepcopy(five_gram_s)
+#                         five_gram_s_copy[2*k] = "*"
+#                         gram_c_x = "".join(five_gram_s_copy)
+#                         grams_C_X.append(gram_c_x)
+# =============================================================================
             numer = 0
             for five_gram_c_x in grams_C_X:
                 if five_gram_c_x in five_gram_dic_X:
