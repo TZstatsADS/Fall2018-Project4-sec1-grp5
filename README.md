@@ -6,7 +6,7 @@
 
 Term: Fall 2018
 
-+ Team #
++ Team #5
 + Team members
 	+ Chen, Jannie mc4398
 	+ Chen, Sizhu sc4248
