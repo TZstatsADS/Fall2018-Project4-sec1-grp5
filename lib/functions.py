@@ -9,6 +9,8 @@ from nltk.metrics.distance import edit_distance
 import py_common_subseq.py_common_subseq as CS #Need to change xrange() as range()
 import math
 import pandas as pd
+import jieba
+import copy
 
 
 # Candidate search
@@ -124,13 +126,20 @@ class project4():
             for five_gram in five_gram_E:
                 five_gram_C.append(five_gram.replace(We, Wc, 1))
             numer = 0
-            for five_gram_c in give_gram_C:
-                numer = numer + five_gram_dic[five_gram_c]
+            for five_gram_c in five_gram_C:
+                if five_gram_c in five_gram_dic:
+                    numer = numer + five_gram_dic[five_gram_c]
+                else:
+                    numer = numer
             Numer[Wc] = numer
-        
+# Here Denom may be zero, check it
+# 5-gram is too lang to get the good result, should try 3-gram
         Denom = max(Numer.values())
         for Wc in candidates:
-            Score[Wc] = Numer[Wc]/Denom
+            if Denom == 0:
+                Score[Wc] = 0
+            else:
+                Score[Wc] = Numer[Wc]/Denom
             
         return(Score)
         
@@ -155,12 +164,18 @@ class project4():
                         grams_C_X.append(gram_c_x)
             numer = 0
             for five_gram_c_x in grams_C_X:
-                numer = numer + five_gram_dic_X[five_gram_c_x]
+                if five_gram_c_x in five_gram_dic_X:
+                    numer = numer + five_gram_dic_X[five_gram_c_x]
+                else:
+                    numer = numer
             Numer[Wc] = numer
         
         Denom = max(Numer.values())
         for Wc in candidates:
-            Score[Wc] = Numer[Wc]/Denom
+            if Denom == 0:
+                Score[Wc] = 0
+            else:
+                Score[Wc] = Numer[Wc]/Denom
         
         return(Score)
         

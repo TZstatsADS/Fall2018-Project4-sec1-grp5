@@ -16,20 +16,70 @@ import sys
 sys.path.append("..")
 from lib.functions import project4 as p4 
 
+#==============================================================================
+lexicon1 = set(pd.read_csv("../output/ground truth dictionary by group/group1.csv").dictionary)
+lexicon2 = set(pd.read_csv("../output/ground truth dictionary by group/group2.csv").dictionary)
+lexicon3 = set(pd.read_csv("../output/ground truth dictionary by group/group3.csv").dictionary)
+lexicon4 = set(pd.read_csv("../output/ground truth dictionary by group/group4.csv").dictionary)
+lexicon5 = set(pd.read_csv("../output/ground truth dictionary by group/group5.csv").dictionary)
+#==============================================================================
+dictionary = pd.read_csv("../output/onegram.csv")
+Dictionary = dictionary.set_index('word').T.to_dict("index")['freq']
+#==============================================================================
+five_gram_dictionary = pd.read_csv("../output/5-gram.csv")
+Five_gram_dictionary = five_gram_dictionary.set_index('5_gram').T.to_dict("index")['freq']
+#==============================================================================
+five_gram_dictionary_c = pd.read_csv("../output/relaxed1.df.csv")
+Five_gram_dictionary_x = five_gram_dictionary_c.set_index('5_gram').T.to_dict("index")['freq']
+five_gram_dictionary_c = pd.read_csv("../output/relaxed2.df.csv")
+Five_gram_dictionary_x.update(five_gram_dictionary_c.set_index('5_gram').T.to_dict("index")['freq'])
+five_gram_dictionary_c = pd.read_csv("../output/relaxed3.df.csv")
+Five_gram_dictionary_x.update(five_gram_dictionary_c.set_index('5_gram').T.to_dict("index")['freq'])
+five_gram_dictionary_c = pd.read_csv("../output/relaxed4.df.csv")
+Five_gram_dictionary_x.update(five_gram_dictionary_c.set_index('5_gram').T.to_dict("index")['freq'])
+five_gram_dictionary_c = pd.read_csv("../output/relaxed5.df.csv")
+Five_gram_dictionary_x.update(five_gram_dictionary_c.set_index('5_gram').T.to_dict("index")['freq'])
+#==============================================================================
+error_detection = pd.read_csv("../output/orc5.csv")
+Error_Detection = error_detection.loc[error_detection.correct_word==False]
 
+Threshold = 10
+for We in Error_Detection.word:
 
-
-Dictionary = pd.read_csv("../output/test_dictionary.csv").word
-Threshold = 3
-We = 'rah'
     
-Candidates = p4.candidate_search(Dictionary, We, Threshold)
-dist_score = p4.distance_score(Candidates, We, Threshold)
-a1=0.25
-a2=0.25
-a3=0.25
-a4=0.25
-simi_score = p4.similarity_score(Candidates, We, a1, a2, a3, a4)
+    Candidates = p4.candidate_search(Dictionary, We, Threshold)
+    dist_score = p4.distance_score(Candidates, We, Threshold)
+    a1=0.25
+    a2=0.25
+    a3=0.25
+    a4=0.25
+    simi_score = p4.similarity_score(Candidates, We, a1, a2, a3, a4)
+    
+    pop_score = p4.popularity_score(Candidates)
+    
+    
+    
+    exis_score = p4.existance_score(Candidates, lexicon)
+    
+    
+    
+    five_gram_e = Error_Detection.loc[Error_Detection.word==We]
+    five_gram_list = []
+    for i in range(4):
+        five_gram_list.append(five_gram_e.iloc[0,3+i])
+    five_gram_list.append(We)
+    for i in range(4):
+        five_gram_list.append(five_gram_e.iloc[0,7+i])
+    Five_Gram_E = []
+    for i in range(5):
+        five_gram_string = ' '.join(five_gram_list[i:i+5])
+        Five_Gram_E.append(five_gram_string)
+                  
+    
+    exat_pop_score = p4.exact_popularity_score(Candidates, We, Five_Gram_E, Five_gram_dictionary)
+    
+    
+    relax_pop_score = p4.relaxed_popularity_score(Candidates, We, Five_Gram_E, Five_gram_dictionary_x)
 
 #------------------------------
 
