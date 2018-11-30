@@ -22,7 +22,7 @@ Term: Fall 2018
 
 + Chen, Sizhu: Understood and discussed paper D2. Cleaned the ground truth texts and tesseract texts, and filtered the useless txt pairs and the lines in different length. For evaluation part, established the character-wise evaluation methods and coded the entire part. Organized the Github folders and made the summary. 
 
-+ Li, Yunfan: Understood and discussed paper C2. Create 3-gram and 5-gram candidate sets. Create relaxed-context candidate sets based on ground truth text. Helped to debug the AdaBoost regressions in correction algorithm. Wrote Random Forest algorithm in regression part. 
++ Li, Yunfan: Understood and discussed paper C2. Create 3-gram and 5-gram candidate sets. Create relaxed-context candidate sets based on ground truth text. Helped to debug the AdaBoost regressions in correction algorithm. Applied the AdaBoost model in the correction part.
 
 + Xu, Zhengyang: Understood and discussed paper D2. Understood and reproduced the detection algorithm, including error detections using 2-gram algorithm and feature extraction for error correction part. Discussed and corrected the regression part of correction algorithm.
 
