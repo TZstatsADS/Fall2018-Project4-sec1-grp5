@@ -20,7 +20,7 @@ Term: Fall 2018
 
 + Chen, Jannie: Understood and discussed paper D2. Wrote the ground truth dictionaries for each group. Responsible for the evaluation part. Discussed and wrote the word-wise evaluation functions. Applied the AdaBoost model in the correction part. Organized the Github and wrote the readme file.  
 
-+ Chen, Sizhu: Understood and discussed paper D2. Cleaned the text. Responsible for the evaluation part. Tested the word-wise evaluation functions and wrote the character-wise evaluation functions. Organized the Github folders and made the summary. 
++ Chen, Sizhu: Understood and discussed paper D2. Cleaned the ground truth texts and tesseract texts, and filtered the useless txt pairs and the lines in different length. For evaluation part, established the character-wise evaluation methods and coded the entire part. Organized the Github folders and made the summary. 
 
 + Li, Yunfan: Understood and discussed paper C2. Create 3-gram and 5-gram candidate sets. Create relaxed-context candidate sets based on ground truth text. Helped to debug the AdaBoost regressions in correction algorithm. Wrote Random Forest algorithm in regression part. 
 
